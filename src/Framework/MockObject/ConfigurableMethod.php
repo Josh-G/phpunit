@@ -9,6 +9,7 @@
  */
 namespace PHPUnit\Framework\MockObject;
 
+use SebastianBergmann\Type\ObjectType;
 use SebastianBergmann\Type\Type;
 
 /**
@@ -40,6 +41,9 @@ final class ConfigurableMethod
     public function mayReturn($value): bool
     {
         if ($value === null && $this->returnType->allowsNull()) {
+            return true;
+        }
+        if ($this->returnType instanceof ObjectType && $this->returnType->className()->getSimpleName() === 'mixed') {
             return true;
         }
 
