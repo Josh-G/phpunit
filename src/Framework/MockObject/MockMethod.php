@@ -24,8 +24,10 @@ use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionType;
+use ReflectionUnionType;
 use SebastianBergmann\Type\ObjectType;
 use SebastianBergmann\Type\Type;
+use SebastianBergmann\Type\UnionType;
 use SebastianBergmann\Type\UnknownType;
 use SebastianBergmann\Type\VoidType;
 use Text_Template;
@@ -383,6 +385,15 @@ final class MockMethod
             }
 
             return ObjectType::fromName($parentClass->getName(), $returnType->allowsNull());
+        }
+
+        if ($returnType instanceof ReflectionUnionType) {
+            return new UnionType(
+                array_map(
+                    fn(ReflectionNamedType $type) => Type::fromName($type->getName(), false),
+                    $returnType->getTypes()
+                ),
+            );
         }
 
         return Type::fromName($returnType->getName(), $returnType->allowsNull());
